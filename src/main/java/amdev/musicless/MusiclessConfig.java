@@ -3,7 +3,6 @@ package amdev.musicless;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,20 +18,9 @@ public final class MusiclessConfig {
 	}
 
 	public static synchronized void load() {
+		// Always start disabled by default when the game boots.
 		musicEnabled = false;
-
-		if (!Files.exists(CONFIG_PATH)) {
-			save();
-			return;
-		}
-
-		Properties properties = new Properties();
-		try (InputStream in = Files.newInputStream(CONFIG_PATH)) {
-			properties.load(in);
-			musicEnabled = Boolean.parseBoolean(properties.getProperty(KEY_MUSIC_ENABLED, "false"));
-		} catch (IOException e) {
-			Musicless.LOGGER.warn("Failed to load config at {}", CONFIG_PATH, e);
-		}
+		save();
 	}
 
 	public static synchronized boolean isMusicEnabled() {

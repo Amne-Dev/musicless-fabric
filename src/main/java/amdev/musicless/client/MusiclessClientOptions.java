@@ -12,6 +12,8 @@ public final class MusiclessClientOptions {
 		MusiclessClientOptions::onMusicEnabledChanged
 	);
 
+	private static Boolean lastAppliedEnabled;
+
 	private MusiclessClientOptions() {
 	}
 
@@ -21,24 +23,36 @@ public final class MusiclessClientOptions {
 	}
 
 	public static void applyCurrentAudioPolicy() {
-		applyAudioPolicy(MusiclessConfig.isMusicEnabled());
+		boolean enabled = MusiclessConfig.isMusicEnabled();
+		applyAudioPolicy(enabled);
+		lastAppliedEnabled = enabled;
+	}
+
+	public static void syncAudioPolicy() {
+		boolean enabled = MusiclessConfig.isMusicEnabled();
+		if (lastAppliedEnabled == null || lastAppliedEnabled != enabled) {
+			applyAudioPolicy(enabled);
+			lastAppliedEnabled = enabled;
+		}
 	}
 
 	private static void onMusicEnabledChanged(boolean enabled) {
 		MusiclessConfig.setMusicEnabled(enabled);
 		applyAudioPolicy(enabled);
+		lastAppliedEnabled = enabled;
 	}
 
 	private static void applyAudioPolicy(boolean enabled) {
 		Minecraft client = Minecraft.getInstance();
-		if (enabled) {
-			float recordsVolume = client.options.getSoundSourceVolume(SoundSource.RECORDS);
-			client.getSoundManager().updateCategoryVolume(SoundSource.RECORDS, recordsVolume);
-			return;
+
+		if (!enabled) {
+			client.getMusicManager().stopPlaying();
+			client.getSoundManager().stop(null, SoundSource.MUSIC);
 		}
 
-		client.getMusicManager().stopPlaying();
-		client.getSoundManager().stop(null, SoundSource.MUSIC);
-		client.getSoundManager().updateCategoryVolume(SoundSource.RECORDS, 0.0F);
+		float musicVolume = client.options.getFinalSoundSourceVolume(SoundSource.MUSIC);
+		float recordsVolume = client.options.getFinalSoundSourceVolume(SoundSource.RECORDS);
+		client.getSoundManager().updateCategoryVolume(SoundSource.MUSIC, musicVolume);
+		client.getSoundManager().updateCategoryVolume(SoundSource.RECORDS, recordsVolume);
 	}
 }
