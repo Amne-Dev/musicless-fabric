@@ -1,0 +1,17 @@
+{
+	"required": true,
+	"package": "amdev.musicless.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [],
+	"client": [
+		"client.OptionsSubScreenAccessor",
+		"client.SoundOptionsScreenMixin",
+		"client.SoundManagerMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}
