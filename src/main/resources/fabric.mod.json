@@ -17,6 +17,9 @@
 		"main": [
 			"amdev.musicless.Musicless"
 		],
+		"client": [
+			"amdev.musicless.client.MusiclessClient"
+		],
 		"fabric-datagen": [
 			"amdev.musicless.MusiclessDataGenerator"
 		]

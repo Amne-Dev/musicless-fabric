@@ -20,15 +20,25 @@ public final class MusiclessClientOptions {
 		return MUSIC_ENABLED_OPTION;
 	}
 
+	public static void applyCurrentAudioPolicy() {
+		applyAudioPolicy(MusiclessConfig.isMusicEnabled());
+	}
+
 	private static void onMusicEnabledChanged(boolean enabled) {
 		MusiclessConfig.setMusicEnabled(enabled);
+		applyAudioPolicy(enabled);
+	}
+
+	private static void applyAudioPolicy(boolean enabled) {
+		Minecraft client = Minecraft.getInstance();
 		if (enabled) {
+			float recordsVolume = client.options.getSoundSourceVolume(SoundSource.RECORDS);
+			client.getSoundManager().updateCategoryVolume(SoundSource.RECORDS, recordsVolume);
 			return;
 		}
 
-		Minecraft client = Minecraft.getInstance();
 		client.getMusicManager().stopPlaying();
 		client.getSoundManager().stop(null, SoundSource.MUSIC);
-		client.getSoundManager().stop(null, SoundSource.RECORDS);
+		client.getSoundManager().updateCategoryVolume(SoundSource.RECORDS, 0.0F);
 	}
 }
